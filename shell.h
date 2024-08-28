@@ -10,6 +10,8 @@
 extern char **environ;
 
 int main(void);
+void shell_loop(void);
+char *read_input(void);
 int exec_command(char *cmd);
 
 #endif /* SHELL_H */
