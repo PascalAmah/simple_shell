@@ -82,6 +82,8 @@ void error_file(char **argv, int c);
 extern char **environ;
 void create_envi(char **envi);
 void free_env(char **env);
+int _setenv(char **cmd);
+int _unsetenv(char **cmd);
 
 /****** PRINTING FUNCTIONS *****/
 
@@ -136,4 +138,3 @@ typedef struct _builtin
 } builtin;
 
 #endif /*HEADER_H*/
-

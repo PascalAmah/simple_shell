@@ -27,3 +27,41 @@ void free_env(char **env)
 		free(env[i]);
 	}
 }
+
+/**
+ * _setenv - Handles the setenv built-in command
+ * @cmd: Command arguments
+ * Return: 0 on success, -1 on failure
+ */
+int _setenv(char **cmd)
+{
+	if (cmd[1] == NULL || cmd[2] == NULL)
+	{
+		fprintf(stderr, "Usage: setenv VARIABLE VALUE\n");
+		return (-1);
+	}
+
+	if (setenv(cmd[1], cmd[2], 1) == -1)
+		return (-1);
+
+	return (0);
+}
+
+/**
+ * _unsetenv - Handles the unsetenv built-in command
+ * @cmd: Command arguments
+ * Return: 0 on success, -1 on failure
+ */
+int _unsetenv(char **cmd)
+{
+	if (cmd[1] == NULL)
+	{
+		fprintf(stderr, "Usage: unsetenv VARIABLE\n");
+		return (-1);
+	}
+
+	if (unsetenv(cmd[1]) == -1)
+		return (-1);
+
+	return (0);
+}

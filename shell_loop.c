@@ -32,6 +32,16 @@ int main(__attribute__((unused)) int argc, char **argv)
 				free(commands);
 				exit_bul(cmd, input, argv, count, stat);
 			}
+			else if (_strcmp(cmd[0], "setenv") == 0)
+			{
+				if (_setenv(cmd) == -1)
+					perror("setenv");
+			}
+			else if (_strcmp(cmd[0], "unsetenv") == 0)
+			{
+				if (_unsetenv(cmd) == -1)
+					perror("unsetenv");
+			}
 			else if (check_builtin(cmd) == 0)
 			{
 				stat = handle_builtin(cmd, stat);
