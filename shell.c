@@ -33,8 +33,17 @@ int main(void)
 		if (line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
 
-		if (strlen(line) > 0)
+		if (strlen(line) == 0)
+			continue;
+
+		if (line[0] == '-' || line[0] == '/')
+		{
 			exec_command(line);
+		}
+		else
+		{
+			printf("$: No such file or directory\n");
+		}	
 	}
 
 	free(line);
