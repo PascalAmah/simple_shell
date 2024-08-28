@@ -7,6 +7,8 @@
 #include <string.h>
 #include <sys/wait.h>
 
+extern char **environ;
+
 int main(void);
 int exec_command(char *cmd);
 

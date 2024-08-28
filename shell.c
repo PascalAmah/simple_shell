@@ -66,7 +66,7 @@ int exec_command(char *cmd)
 
 	if (fork() == 0)
 	{
-		if (execvp(args[0], args) == -1)
+		if (execve(args[0], args, environ) == -1)
 		{
 			perror("Error");
 			exit(EXIT_FAILURE);
