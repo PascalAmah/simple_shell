@@ -1,103 +1,50 @@
 #include "shell.h"
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/wait.h>
 
 /**
- * main - Entry point for the shell
- *
- * Return: Always 0 (Success)
+ * main - Entry point to program
+ * @argc: Argument count
+ * @argv: Argument vector
+ * Return: Returns condition
  */
-int main(void)
+int main(__attribute__((unused)) int argc, char **argv)
 {
-	shell_loop();
-	return (0);
-}
+	char *input, **cmd, **commands;
+	int count = 0, i, condition = 1, stat = 0;
 
-/**
- * shell_loop - Runs the shell loop, reading and executing commands
- */
-void shell_loop(void)
-{
-	char *input;
-	int status = 1;
-
-	do {
-		printf("$ ");
-		fflush(stdout);
-
-		input = read_input();
-		if (input == NULL)
+	if (argv[1] != NULL)
+		read_file(argv[1], argv);
+	signal(SIGINT, signal_to_handle);
+	while (condition)
+	{
+		count++;
+		if (isatty(STDIN_FILENO))
+			prompt();
+		input = get_line();
+		if (input[0] == '\0')
+			continue;
+		history(input);
+		commands = separator(input);
+		for (i = 0; commands[i] != NULL; i++)
 		{
-			free(input);
-			exit(0);
+			cmd = parse_cmd(commands[i]);
+			if (_strcmp(cmd[0], "exit") == 0)
+			{
+				free(commands);
+				exit_bul(cmd, input, argv, count, stat);
+			}
+			else if (check_builtin(cmd) == 0)
+			{
+				stat = handle_builtin(cmd, stat);
+				free(cmd);
+				continue;
+			}
+			else
+				stat = check_cmd(cmd, input, count, argv);
+			free(cmd);
 		}
-
-		if (input[0] != '\0')
-		{
-			status = exec_command(input);
-		}
-
 		free(input);
-	} while (status);
-}
-
-/**
- * read_input - Reads input from stdin
- *
- * Return: The input string
- */
-char *read_input(void)
-{
-	char *input = NULL;
-	size_t bufsize = 0;
-
-	if (getline(&input, &bufsize, stdin) == -1)
-	{
-		if (feof(stdin))
-		{
-			free(input);
-			exit(0);
-		}
-		else
-		{
-			perror("read_input");
-			free(input);
-			exit(EXIT_FAILURE);
-		}
+		free(commands);
+		wait(&stat);
 	}
-
-	input[strlen(input) - 1] = '\0';
-	return (input);
-}
-
-/**
- * exec_command - Forks a child process to execute the command
- * @cmd: The command to be executed
- *
- * Return: 1 to continue the loop, 0 to exit
- */
-int exec_command(char *cmd)
-{
-	char *args[2];
-	int status;
-
-	args[0] = cmd;
-	args[1] = NULL;
-
-	if (fork() == 0)
-	{
-		if (execve(args[0], args, environ) == -1)
-		{
-			perror("./hsh");
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		wait(&status);
-	}
-
-	return (1);
+	return (stat);
 }
