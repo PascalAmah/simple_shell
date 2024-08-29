@@ -12,10 +12,10 @@ int change_dir(char **cmd, __attribute__((unused))int st)
 	char cwd[PATH_MAX], *oldpwd;
 
 	if (cmd[1] == NULL)
-		value = chdir(getenv("HOME"));
+		value = chdir(_getenv("HOME"));
 	else if (_strcmp(cmd[1], "-") == 0)
 	{
-		oldpwd = getenv("OLDPWD");
+		oldpwd = _getenv("OLDPWD");
 		if (oldpwd == NULL)
 		{
 			fprintf(stderr, "hsh: cd: OLDPWD not set \n");
@@ -36,7 +36,7 @@ int change_dir(char **cmd, __attribute__((unused))int st)
 	{
 		if (getcwd(cwd, sizeof(cwd)) != NULL)
 		{
-			setenv("OLDPWD", getenv("PWD"), 1);
+			setenv("OLDPWD", _getenv("PWD"), 1);
 			setenv("PWD", cwd, 1);
 		}
 		else
@@ -77,7 +77,7 @@ int dis_env(__attribute__((unused)) char **cmd, __attribute__((unused)) int st)
 int echo_bul(char **cmd, int st)
 {
 	char *path;
-	unsigned int pid = getppid();
+	unsigned int pid = getpid();
 
 	if (_strncmp(cmd[1], "$?", 2) == 0)
 	{
@@ -89,12 +89,17 @@ int echo_bul(char **cmd, int st)
 		print_number(pid);
 		PRINT("\n");
 	}
-	else if (_strncmp(cmd[1], "$PATH", 5) == 0)
+	else if (cmd[1][0] == '$')
 	{
-		path = _getenv("PATH");
-		PRINT(path);
-		PRINT("\n");
-		free(path);
+		path = _getenv(cmd[1] + 1);
+		if (path)
+		{
+			PRINT(path);
+			PRINT("\n");
+			free(path);
+		}
+		else
+			PRINT("\n");
 	}
 	else
 		return (print_echo(cmd));
